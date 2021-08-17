@@ -13,6 +13,6 @@ public class ShopManagerApplication {
     public static void main(String[] args) {
         logger.info("Application started successfully!");
         SpringApplication.run(ShopManagerApplication.class, args);
-        logger.info("Service is up and running");
+        logger.info("Service is up and running!");
     }
 }
