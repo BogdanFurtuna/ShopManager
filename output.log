@@ -1,8 +1,20 @@
-2021-08-18 11:15:28 INFO PRINT PRODUCTS CATEGORY CLOTHES
-2021-08-18 11:15:36 INFO PRINT CATEGORIES
-2021-08-18 11:24:16 INFO PRINT PRODUCTS CATEGORY null
-2021-08-18 11:24:16 ERROR Please provide a category name!
-2021-08-18 11:24:16 ERROR The category null does not exist!
-2021-08-18 11:33:37 INFO PRINT PRODUCT
-2021-08-18 11:33:45 INFO PRINT PRODUCT
-2021-08-18 11:33:45 ERROR The product MILKs does not exist!
+2021-08-17 10:05:35 INFO  Application started successfully!
+2021-08-17 10:05:38 INFO  Service is up and running
+2021-08-17 10:06:42 INFO  Application started successfully!
+2021-08-17 10:06:44 INFO  Service is up and running
+2021-08-17 10:07:29 INFO  Application started successfully!
+2021-08-17 10:07:32 INFO  Service is up and running
+2021-08-17 10:08:35 INFO  Application started successfully!
+2021-08-17 10:08:38 INFO  Service is up and running
+2021-08-17 10:15:23 INFO  Application started successfully!
+2021-08-17 10:15:25 INFO  Service is up and running
+2021-08-18 08:16:12 INFO  Application started successfully!
+2021-08-18 08:16:15 INFO  Service is up and running!
+2021-08-18 08:36:53 INFO  Application started successfully!
+2021-08-18 08:36:56 INFO  Service is up and running!
+2021-08-18 08:40:05 INFO  Application started successfully!
+2021-08-18 08:40:08 INFO  Service is up and running!
+2021-08-18 08:44:48 INFO  Application started successfully!
+2021-08-18 08:44:51 INFO  Service is up and running!
+2021-08-18 10:25:51 ERROR SALUT
+2021-08-18 10:25:51 ERROR SALUT
