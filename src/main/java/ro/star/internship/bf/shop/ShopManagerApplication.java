@@ -20,10 +20,6 @@ public class ShopManagerApplication {
 
 
     public static void main(String[] args) {
-        logger.info("Application started successfully!");
-        logger.debug("APP STARTED");
-        logger.error("SALUT");
-
         Category c1 = new Category("FOOD");
         Category c2 = new Category("CLOTHES");
         categoryList.add(c1);
@@ -35,8 +31,12 @@ public class ShopManagerApplication {
         productList.add(p2);
         c1.setProductList(productList);
 
+        Product p3 = new Product("PANTS", 6,6,100);
+        ArrayList<Product> prodList = new ArrayList<>();
+        prodList.add(p3);
+        c2.setProductList(prodList);
+
         SpringApplication.run(ShopManagerApplication.class, args);
-        logger.info("Service is up and running!");
     }
 
     public static LinkedHashSet<Category> getCategoryList() {
