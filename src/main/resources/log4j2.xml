@@ -7,24 +7,21 @@
         </Console>
         <File name="FileAppender" fileName="output.log" append="true">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %p %m%n</Pattern>
             </PatternLayout>
         </File>
 
     </Appenders>
     <Loggers>
-        <Logger name="ro.star.internship.bf.shop" level="ERROR">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
-        </Logger>
-        <Logger name="ro.star.internship.bf.shop.controller" level="DEBUG">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
-        </Logger>
         <Root level="INFO">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Root>
+
+        <Logger name="ro.star.internship.bf.shop" level="ERROR">
+        </Logger>
+        <Logger name="ro.star.internship.bf.shop.controller" level="DEBUG">
+        </Logger>
     </Loggers>
 
 </Configuration>
