@@ -13,10 +13,6 @@
 
     </Appenders>
     <Loggers>
-        <Root level="INFO">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
-        </Root>
         <Logger name="ro.star.internship.bf.shop" level="ERROR">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
@@ -25,7 +21,10 @@
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Logger>
-
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
     </Loggers>
 
 </Configuration>
