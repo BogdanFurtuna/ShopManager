@@ -31,7 +31,7 @@ public class ShopManagerApplication {
         productList.add(p2);
         c1.setProductList(productList);
 
-        Product p3 = new Product("PANTS", 6,6,100);
+        Product p3 = new Product("PANTS", 5,6,100);
         ArrayList<Product> prodList = new ArrayList<>();
         prodList.add(p3);
         c2.setProductList(prodList);
