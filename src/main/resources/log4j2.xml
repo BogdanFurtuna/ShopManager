@@ -14,12 +14,8 @@
     </Appenders>
     <Loggers>
         <Logger name="ro.star.internship.bf.shop" level="ERROR">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
         </Logger>
         <Logger name="ro.star.internship.bf.shop.controller" level="DEBUG">
-            <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="FileAppender"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="ConsoleAppender"/>
