@@ -1,28 +1,29 @@
 package ro.star.internship.bf.shop.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.ArrayList;
 
+@Entity
 public class Category {
-    private final String name;
-    private ArrayList<Product> productList = new ArrayList<>();
-    public Category(String name){
-        this.name = name;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    private String categoryname;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void addProduct(Product product){
-        productList.add(product);
+    public String getCategoryname() {
+        return categoryname;
     }
 
-    public String getName() {
-        return name;
+    public void setCategoryname(String categoryname) {
+        this.categoryname = categoryname;
     }
-
-    public ArrayList<Product> getProductList() {
-        return productList;
-    }
-
-    public void setProductList(ArrayList<Product> productList) {
-        this.productList = productList;
-    }
-
 }
