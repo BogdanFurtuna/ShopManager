@@ -1,19 +1,26 @@
 package ro.star.internship.bf.shop.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Client {
-    private final String userName;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    private String username;
     private long balance;
-    public Client(String userName, long balance){
-        this.userName = userName;
-        this.balance = balance;
-    }
 
     public long getBalance() {
         return balance;
     }
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setBalance(long balance) {
