@@ -3,6 +3,8 @@ package ro.star.internship.bf.shop.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.star.internship.bf.shop.model.*;
 import ro.star.internship.bf.shop.repositories.CategoryRepository;
@@ -22,9 +24,8 @@ public class CommandController {
     private ClientRepository clientRepository;
 
     private static Logger logger = LogManager.getLogger(CommandController.class);
-    private boolean productFound = false;
-    private boolean categoryFound = false;
-    private boolean errorFound = false;
+    private final ResponseEntity BAD_REQUEST = new ResponseEntity(HttpStatus.BAD_REQUEST);
+    private final ResponseEntity OK = new ResponseEntity(HttpStatus.OK);
 
     @GetMapping("/print_categories")
     public Iterable<Category> printCategories() {
@@ -39,291 +40,221 @@ public class CommandController {
     }
 
     @GetMapping("/print_products_category")
-    public ArrayList<Product> printProductsCategory(@RequestParam String name){
+    public ResponseEntity printProductsCategory(@RequestParam String categoryName){
 
-        logger.info("PRINT PRODUCTS CATEGORY " + name);
-        categoryFound = false;
+        logger.info("PRINT PRODUCTS CATEGORY " + categoryName);
+        Category category = categoryRepository.findCategoryByCategoryname(categoryName);
         ArrayList<Product> products = new ArrayList<>();
-        Integer categoryID = 0;
-        for(Category category : categoryRepository.findAll()){
-            if(category.getCategoryname().equals(name)){
-                categoryFound = true;
-                categoryID = category.getId();
-                break;
-            }
-        }
-        if(!categoryFound){
-            logger.error("Category " + name + " doesn't exist!");
-            errorFound = true;
-        }
-        if(!errorFound) {
+
+        if(category == null){
+            logger.error("Category " + categoryName + " doesn't exist!");
+            return BAD_REQUEST;
+        }else{
             for (Product product : productRepository.findAll()) {
-                if (product.getCategoryID().equals(categoryID)) {
+                if (product.getCategoryID().equals(category.getId())) {
                     products.add(product);
                 }
             }
+            if(products.size() == 0){
+                logger.info("Category " + categoryName + " does not have any products!");
+            }
+            return new ResponseEntity<>(products, HttpStatus.OK);
         }
-        if(products.size() == 0){
-            logger.info("Category " + name + " does not have any products!");
-        }
-        return products;
     }
 
     @GetMapping("/print_products")
-    public Product printProduct(@RequestParam String name){
+    public ResponseEntity printProduct(@RequestParam String name){
 
         logger.info("PRINT PRODUCTS " + name);
-        Product p = new Product();
-        productFound = false;
-        for(Product product : productRepository.findAll()){
-            if(product.getName().equals(name)){
-                p = product;
-                productFound = true;
-                break;
-            }
-        }
-        if(!productFound){
+        if(productRepository.findProductByName(name) != null){
+            return new ResponseEntity<>(productRepository.findProductByName(name), HttpStatus.OK);
+        }else{
             logger.error("Product " + name + " does not exist!");
+            return BAD_REQUEST;
         }
-        return p;
     }
 
     @PostMapping("/add_new_category")
-    public void addNewCategory(@RequestParam String name){
+    public ResponseEntity addNewCategory(@RequestParam String categoryName){
 
-        logger.info("ADD NEW CATEGORY " + name);
-        categoryFound = false;
-        for(Category category : categoryRepository.findAll()){
-            if(category.getCategoryname().equals(name)){
-                categoryFound = true;
-                break;
-            }
-        }
-        if(categoryFound){
-            logger.error("Category " + name + " already exists!");
+        logger.info("ADD NEW CATEGORY " + categoryName);
+        Category category = categoryRepository.findCategoryByCategoryname(categoryName);
+        if(category != null){
+            logger.error("Category " + categoryName + " already exists!");
+            return BAD_REQUEST;
         }else{
-            logger.info("Category " + name + " has been added to the database!");
-            Category category = new Category();
-            category.setCategoryname(name);
+            logger.info("Category " + categoryName + " has been added to the database!");
+            category = new Category();
+            category.setCategoryName(categoryName);
             categoryRepository.save(category);
         }
+        return OK;
     }
 
     @PostMapping("/add_new_product")
-    public void addNewProduct(@RequestParam String name,
-                              @RequestParam String categoryName,
-                              @RequestParam String quantity,
-                              @RequestParam String price){
+    public ResponseEntity addNewProduct(@RequestParam String name,
+                                        @RequestParam String categoryName,
+                                        @RequestParam String quantity,
+                                        @RequestParam String price){
 
         logger.info("ADD NEW PRODUCT " + name);
-        productFound = false; categoryFound = false; errorFound = false;
-        Integer categoryID = 0;
-        long productPrice = 0, productQuantity = 0;
-
-        for(Product p : productRepository.findAll()){
-            if(p.getName().equals(name)){
-                productFound = true;
-                break;
-            }
-        }
-        if(productFound){
-           logger.error("Product " + name + " already exists!");
-           errorFound = true;
+        Product product = productRepository.findProductByName(name);
+        if(product != null){
+            logger.error("Product " + name + " already exists!");
+            return BAD_REQUEST;
         }
 
-        for(Category category : categoryRepository.findAll()){
-            if(category.getCategoryname().equals(categoryName)){
-                categoryFound = true;
-                categoryID = category.getId();
-                break;
-            }
-        }
-        if(!categoryFound){
+        Category category = categoryRepository.findCategoryByCategoryname(categoryName);
+        Integer categoryID;
+        if(category == null){
             logger.error("Category " + categoryName + " doesn't exist!");
-            errorFound = true;
+            return BAD_REQUEST;
+        }else{
+            categoryID = category.getId();
         }
 
+        long productQuantity;
         try{
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                errorFound = true;
+                return BAD_REQUEST;
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
+        long productPrice;
         try{
             productPrice = Integer.parseInt(price);
             if(productPrice < 0){
                 logger.error("Invalid number for Price!");
-                errorFound = true;
+                return BAD_REQUEST;
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Price!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        if(!errorFound){
-            logger.info("Product " + name + " has been added to the database!");
-            Product product = new Product();
-            product.setCategoryID(categoryID);
-            product.setQuantity(productQuantity);
-            product.setName(name);
-            product.setPrice(productPrice);
-            product.setMaxQuantity(200);
-            productRepository.save(product);
-        }
+        product = new Product();
+        product.setCategoryID(categoryID);
+        product.setQuantity(productQuantity);
+        product.setName(name);
+        product.setPrice(productPrice);
+        product.setMaxQuantity(200);
+        productRepository.save(product);
+        logger.info("Product " + name + " has been added to the database!");
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PatchMapping("/replenish")
-    public void replenishProduct(@RequestParam String name,
-                                 @RequestParam String quantity){
+    public ResponseEntity replenishProduct(@RequestParam String name,
+                                           @RequestParam String quantity){
 
         logger.info("REPLENISH " + name + " " + quantity);
-        long productQuantity = 0;
-        errorFound = false; productFound = false;
-
+        long productQuantity;
         try{
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                errorFound = true;
+                return BAD_REQUEST;
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        for(Product p : productRepository.findAll()){
-            if(p.getName().equals(name)){
-                productFound = true;
-                break;
-            }
-        }
-        if(!productFound){
+        Product product = productRepository.findProductByName(name);
+        if(product == null){
             logger.error("Product " + name + " does not exist!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        if(!errorFound){
-            for(Product product : productRepository.findAll()){
-                if(product.getName().equals(name)){
-                    if(product.getQuantity() == product.getMaxQuantity()){
-                        logger.error("Cannot replenish product " + name + " because the stock is full");
-                    }else if(product.getQuantity() + productQuantity > product.getMaxQuantity()){
-                        logger.error("Cannot replenish product " + name + " because it will overcome the maximum stock");
-                    }else{
-                        logger.info(name + " replenished with " + quantity + " units.");
-                        product.setQuantity(product.getQuantity() + productQuantity);
-                        productRepository.save(product);
-                    }
-                }
-            }
+        if(product.getQuantity() == product.getMaxQuantity()){
+            logger.error("Cannot replenish product " + name + " because the stock is full");
+            return BAD_REQUEST;
+        }else if(product.getQuantity() + productQuantity > product.getMaxQuantity()){
+            logger.error("Cannot replenish product " + name + " because it will overcome the maximum stock");
+            return BAD_REQUEST;
+        }else{
+            logger.info(name + " replenished with " + quantity + " units.");
+            product.setQuantity(product.getQuantity() + productQuantity);
+            productRepository.save(product);
         }
+        return OK;
     }
 
     @PatchMapping("/buy")
-    public void buyProductForClient(@RequestParam(value = "name", defaultValue = "null") String name,
-                                  @RequestParam(value = "quantity", defaultValue = "null") String quantity,
-                                  @RequestParam(value = "userName", defaultValue = "null") String userName){
+    public ResponseEntity buyProductForClient(@RequestParam String name,
+                                  @RequestParam String quantity,
+                                  @RequestParam String userName){
 
         logger.info("BUY PRODUCT " + name + " FOR " + userName);
         long productQuantity;
-        productFound = false; errorFound = false;
-        boolean clientFound = false;
-
         try{
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                errorFound = true;
+                return BAD_REQUEST;
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        for(Product p : productRepository.findAll()){
-            if(p.getName().equals(name)){
-                productFound = true;
-                break;
-            }
-        }
-        if(!productFound){
+        Product product = productRepository.findProductByName(name);
+        if(product == null){
             logger.error("Product " + name + " does not exist!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        for(Client client : clientRepository.findAll()){
-            if(client.getUserName().equals(userName)){
-                clientFound = true;
-                break;
-            }
-        }
-        if(!clientFound){
+        Client client = clientRepository.findClientByUsername(userName);
+        if(client == null){
             logger.error("Client " + userName + " does not exist!");
-            errorFound = true;
+            return BAD_REQUEST;
         }
 
-        if(!errorFound){
-            for(Product product : productRepository.findAll()){
-                if(product.getName().equals(name)){
-                    if(product.getQuantity() < Integer.parseInt(quantity)){
-                        logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because there is only " + product.getQuantity() + " " + name + " left.");
-                    }else{
-                        long balance;
-                        for(Client client : clientRepository.findAll()){
-                            if(client.getUserName().equals(userName)){
-                                balance = client.getBalance();
-                                long amountToPay = product.getPrice() * Integer.parseInt(quantity);
-                                if(balance < amountToPay){
-                                    logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because his balance is " + balance + " and the total cost is " + amountToPay);
-                                }else{
-                                    logger.info("User " + userName + " has bought " + quantity + " " + name + ".");
-                                    long newQuantity = product.getQuantity() - Integer.parseInt(quantity);
-                                    product.setQuantity(newQuantity);
-                                    productRepository.save(product);
-                                    client.setBalance(balance - amountToPay);
-                                    clientRepository.save(client);
-                                }
-                            }
-                        }
-                    }
-                }
+        if(product.getQuantity() < Integer.parseInt(quantity)){
+            logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because there is only " + product.getQuantity() + " " + name + " left.");
+            return BAD_REQUEST;
+        }else{
+            long balance;
+            balance = client.getBalance();
+            long amountToPay = product.getPrice() * Integer.parseInt(quantity);
+            if(balance < amountToPay){
+                logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because his balance is " + balance + " and the total cost is " + amountToPay);
+                return BAD_REQUEST;
+            }else{
+                logger.info("User " + userName + " has bought " + quantity + " " + name + ".");
+                long newQuantity = product.getQuantity() - Integer.parseInt(quantity);
+                product.setQuantity(newQuantity);
+                productRepository.save(product);
+                client.setBalance(balance - amountToPay);
+                clientRepository.save(client);
             }
         }
+        return OK;
     }
 
     @DeleteMapping("/remove_product")
-    public void removeProduct(@RequestParam String name){
+    public ResponseEntity removeProduct(@RequestParam String name){
 
         logger.info("REMOVE PRODUCT " + name);
-        productFound = false;
-
-        for(Product p : productRepository.findAll()){
-            if(p.getName().equals(name)){
-                productFound = true;
-                break;
-            }
-        }
-        if(!productFound){
+        Product product = productRepository.findProductByName(name);
+        if(product == null){
             logger.error("Product " + name + " does not exist!");
+            return BAD_REQUEST;
         }else{
-            for(Product product : productRepository.findAll()){
-                if(product.getName().equals(name)){
-                    if(product.getQuantity() != 0){
-                        logger.error("Cannot remove " + name + " because quantity is not zero. Quantity is " + product.getQuantity());
-                    }else{
-                        productRepository.delete(product);
-                    }
-                    break;
-                }
+            if(product.getQuantity() != 0){
+                logger.error("Cannot remove " + name + " because quantity is not zero. Quantity is " + product.getQuantity());
+                return BAD_REQUEST;
+            }else {
+                productRepository.delete(product);
             }
         }
-
-
+        return OK;
     }
 
 }

@@ -4,4 +4,5 @@ import org.springframework.data.repository.CrudRepository;
 import ro.star.internship.bf.shop.model.Product;
 
 public interface ProductRepository extends CrudRepository<Product, Integer> {
+    Product findProductByName(String name);
 }

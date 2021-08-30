@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.ArrayList;
 
 @Entity
 public class Category {
@@ -19,11 +18,11 @@ public class Category {
         return id;
     }
 
-    public String getCategoryname() {
+    public String getCategoryName() {
         return categoryname;
     }
 
-    public void setCategoryname(String categoryname) {
+    public void setCategoryName(String categoryname) {
         this.categoryname = categoryname;
     }
 }
