@@ -4,4 +4,5 @@ import org.springframework.data.repository.CrudRepository;
 import ro.star.internship.bf.shop.model.Client;
 
 public interface ClientRepository  extends CrudRepository<Client, Integer> {
+    Client findClientByUsername(String username);
 }
