@@ -48,7 +48,7 @@ public class CommandController {
 
         if(category == null){
             logger.error("Category " + categoryName + " doesn't exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category " + categoryName + " doesn't exist!");
         }else{
             for (Product product : productRepository.findAll()) {
                 if (product.getCategoryID().equals(category.getId())) {
@@ -57,6 +57,7 @@ public class CommandController {
             }
             if(products.size() == 0){
                 logger.info("Category " + categoryName + " does not have any products!");
+                return ResponseEntity.status(HttpStatus.OK).body("Category " + categoryName + " does not have any products!");
             }
             return new ResponseEntity<>(products, HttpStatus.OK);
         }
@@ -70,7 +71,7 @@ public class CommandController {
             return new ResponseEntity<>(productRepository.findProductByName(name), HttpStatus.OK);
         }else{
             logger.error("Product " + name + " does not exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product " + name + " does not exist!");
         }
     }
 
@@ -81,14 +82,14 @@ public class CommandController {
         Category category = categoryRepository.findCategoryByCategoryname(categoryName);
         if(category != null){
             logger.error("Category " + categoryName + " already exists!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category " + categoryName + " already exists!");
         }else{
             logger.info("Category " + categoryName + " has been added to the database!");
             category = new Category();
             category.setCategoryName(categoryName);
             categoryRepository.save(category);
         }
-        return OK;
+        return ResponseEntity.status(HttpStatus.OK).body("Category " + categoryName + " has been added to the database!");
     }
 
     @PostMapping("/add_new_product")
@@ -101,14 +102,14 @@ public class CommandController {
         Product product = productRepository.findProductByName(name);
         if(product != null){
             logger.error("Product " + name + " already exists!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product " + name + " already exists!");
         }
 
         Category category = categoryRepository.findCategoryByCategoryname(categoryName);
         Integer categoryID;
         if(category == null){
             logger.error("Category " + categoryName + " doesn't exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category " + categoryName + " doesn't exist!");
         }else{
             categoryID = category.getId();
         }
@@ -118,11 +119,11 @@ public class CommandController {
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
         }
 
         long productPrice;
@@ -130,11 +131,11 @@ public class CommandController {
             productPrice = Integer.parseInt(price);
             if(productPrice < 0){
                 logger.error("Invalid number for Price!");
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Price!");
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Price!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Price!");
         }
 
         product = new Product();
@@ -146,7 +147,7 @@ public class CommandController {
         productRepository.save(product);
         logger.info("Product " + name + " has been added to the database!");
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body("Product " + name + " has been added to the database!");
     }
 
     @PatchMapping("/replenish")
@@ -159,31 +160,31 @@ public class CommandController {
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
         }
 
         Product product = productRepository.findProductByName(name);
         if(product == null){
             logger.error("Product " + name + " does not exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product " + name + " does not exist!");
         }
 
         if(product.getQuantity() == product.getMaxQuantity()){
             logger.error("Cannot replenish product " + name + " because the stock is full");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot replenish product " + name + " because the stock is full");
         }else if(product.getQuantity() + productQuantity > product.getMaxQuantity()){
             logger.error("Cannot replenish product " + name + " because it will overcome the maximum stock");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot replenish product " + name + " because it will overcome the maximum stock");
         }else{
             logger.info(name + " replenished with " + quantity + " units.");
             product.setQuantity(product.getQuantity() + productQuantity);
             productRepository.save(product);
         }
-        return OK;
+        return ResponseEntity.status(HttpStatus.OK).body(name + " replenished with " + quantity + " units.");
     }
 
     @PatchMapping("/buy")
@@ -197,35 +198,35 @@ public class CommandController {
             productQuantity = Integer.parseInt(quantity);
             if(productQuantity < 0){
                 logger.error("Invalid number for Quantity!");
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
             }
         }catch (NumberFormatException nfe){
             logger.error("Invalid number for Quantity!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid number for Quantity!");
         }
 
         Product product = productRepository.findProductByName(name);
         if(product == null){
             logger.error("Product " + name + " does not exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product " + name + " does not exist!");
         }
 
         Client client = clientRepository.findClientByUsername(userName);
         if(client == null){
             logger.error("Client " + userName + " does not exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Client " + userName + " does not exist!");
         }
 
         if(product.getQuantity() < Integer.parseInt(quantity)){
             logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because there is only " + product.getQuantity() + " " + name + " left.");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User " + userName + " cannot buy " + quantity + " " + name + " because there is only " + product.getQuantity() + " " + name + " left.");
         }else{
             long balance;
             balance = client.getBalance();
             long amountToPay = product.getPrice() * Integer.parseInt(quantity);
             if(balance < amountToPay){
                 logger.error("User " + userName + " cannot buy " + quantity + " " + name + " because his balance is " + balance + " and the total cost is " + amountToPay);
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User " + userName + " cannot buy " + quantity + " " + name + " because his balance is " + balance + " and the total cost is " + amountToPay);
             }else{
                 logger.info("User " + userName + " has bought " + quantity + " " + name + ".");
                 long newQuantity = product.getQuantity() - Integer.parseInt(quantity);
@@ -235,7 +236,7 @@ public class CommandController {
                 clientRepository.save(client);
             }
         }
-        return OK;
+        return ResponseEntity.status(HttpStatus.OK).body("User " + userName + " has bought " + quantity + " " + name + ".");
     }
 
     @DeleteMapping("/remove_product")
@@ -245,16 +246,17 @@ public class CommandController {
         Product product = productRepository.findProductByName(name);
         if(product == null){
             logger.error("Product " + name + " does not exist!");
-            return BAD_REQUEST;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product " + name + " does not exist!");
         }else{
             if(product.getQuantity() != 0){
                 logger.error("Cannot remove " + name + " because quantity is not zero. Quantity is " + product.getQuantity());
-                return BAD_REQUEST;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot remove " + name + " because quantity is not zero. Quantity is " + product.getQuantity());
             }else {
                 productRepository.delete(product);
+                logger.info("Product " + name + " was removed from the database!");
             }
         }
-        return OK;
+        return ResponseEntity.status(HttpStatus.OK).body("Product " + name + " was removed from the database!");
     }
 
 }
