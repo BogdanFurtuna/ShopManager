@@ -6,7 +6,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ro.star.internship.bf.shop.model.User;
 import ro.star.internship.bf.shop.repositories.UserRepository;
-
 import java.util.List;
 
 @Configuration
