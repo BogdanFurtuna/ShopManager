@@ -2,6 +2,7 @@ package ro.star.internship.bf.shop.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -30,7 +31,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers( "/","/home").permitAll()
-                .antMatchers("/hello/admin").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/print_categories").permitAll()
+                .antMatchers(HttpMethod.GET, "/print_products_all").permitAll()
+                .antMatchers(HttpMethod.GET, "/print_products_category").permitAll()
+                .antMatchers(HttpMethod.GET, "/print_products").permitAll()
+                .antMatchers(HttpMethod.POST, "/add_new_category").permitAll()
+                .antMatchers(HttpMethod.POST, "/add_new_product").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/replenish").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/buy").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/remove_product").permitAll()
+                .antMatchers("/menu/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -40,6 +50,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll()
-                .and().csrf().disable(); // we'll enable this in a later blog post
+                .and().csrf().disable();
     }
 }
