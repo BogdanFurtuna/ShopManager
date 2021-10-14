@@ -30,7 +30,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers( "/","/home").permitAll()
+                .antMatchers( "/").permitAll()
                 .antMatchers(HttpMethod.GET, "/print_categories").permitAll()
                 .antMatchers(HttpMethod.GET, "/print_products_all").permitAll()
                 .antMatchers(HttpMethod.GET, "/print_products_category").permitAll()
